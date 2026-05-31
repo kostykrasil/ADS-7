@@ -1,53 +1,51 @@
 // Copyright 2022 NNTU-CS
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <random>
 #include "train.h"
 
 int main() {
-    std::ofstream outFile("result/experiment_data.csv");// Открываем файл для сохранения результатов в папке result
-    
-    if (!outFile.is_open()) {
-        std::cerr << "Ошибка: Не удалось открыть файл." << std::endl;// Проверка, удалось ли открыть файл
-        return 1;
+  std::ofstream outFile("result/experiment_data.csv");
+
+  if (!outFile.is_open()) {
+    std::cerr << "Error: Can't open file in result/" << std::endl;
+    return 1;
+  }
+
+  outFile << "Length,AllOff,AllOn,Random\n";
+
+  std::mt19937 gen(123);
+  std::uniform_int_distribution<> dist(0, 1);
+
+  int maxLength = 100;
+
+  for (int n = 2; n <= maxLength; ++n) {
+    Train trainOff;
+    for (int i = 0; i < n; ++i) {
+      trainOff.addCar(false);
     }
+    trainOff.getLength();
+    int opsOff = trainOff.getOpCount();
 
-    outFile << "Length,AllOff,AllOn,Random\n";
-
-    std::mt19937 gen(123);
-    std::uniform_int_distribution<> dist(0, 1);
-
-    int maxLength = 100; // Максимальная длина поезда
-
-    for (int n = 2; n <= maxLength; ++n) {
-        
-        Train trainOff;
-        for (int i = 0; i < n; ++i) {
-            trainOff.addCar(false);
-        }
-        trainOff.getLength();
-        int opsOff = trainOff.getOpCount();
-
-        Train trainOn;
-        for (int i = 0; i < n; ++i) {
-            trainOn.addCar(true);
-        }
-        trainOn.getLength();
-        int opsOn = trainOn.getOpCount();
-
-        Train trainRand;
-        for (int i = 0; i < n; ++i) {
-            trainRand.addCar(dist(gen));
-        }
-        trainRand.getLength();
-        int opsRand = trainRand.getOpCount();
-
-        outFile << n << "," << opsOff << "," << opsOn << "," << opsRand << "\n";
+    Train trainOn;
+    for (int i = 0; i < n; ++i) {
+      trainOn.addCar(true);
     }
+    trainOn.getLength();
+    int opsOn = trainOn.getOpCount();
 
-    outFile.close();
-    
-    std::cout << "Данные сохранены в 'result/experiment_data.csv'." << std::endl;
+    Train trainRand;
+    for (int i = 0; i < n; ++i) {
+      trainRand.addCar(dist(gen));
+    }
+    trainRand.getLength();
+    int opsRand = trainRand.getOpCount();
 
-    return 0;
+    outFile << n << "," << opsOff << "," << opsOn << "," << opsRand << "\n";
+  }
+
+  outFile.close();
+  std::cout << "Done!" << std::endl;
+
+  return 0;
 }
